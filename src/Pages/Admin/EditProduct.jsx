@@ -12,7 +12,7 @@ const EditProduct = () => {
   useEffect(() => {
     const fetchProduct = async () => {
       try {
-        const response = await fetch(`http://localhost:8000/product/singleProduct/${id}`);
+        const response = await fetch(`https://backend-topaz-one-89.vercel.app/product/singleProduct/${id}`);
         const data = await response.json();
         if (data.success) {
           setProductData(data.data);
@@ -33,7 +33,7 @@ const EditProduct = () => {
 
   const handleUpdate = async (formData) => {
     try {
-      const response = await fetch(`http://localhost:8000/product/update/${id}`, {
+      const response = await fetch(`https://backend-topaz-one-89.vercel.app/product/update/${id}`, {
         method: 'PUT',
         headers: {
           'Content-Type': 'application/json',

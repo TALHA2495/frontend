@@ -1,4 +1,4 @@
-const API_URL = "http://localhost:8000/product";
+const API_URL = "https://backend-topaz-one-89.vercel.app/product";
 
 export const productAPI = {
   // Get all products with optional category filter

@@ -10,7 +10,7 @@ const AdminDashboard = () => {
   // Fetch all products
   const fetchProducts = async () => {
     try {
-      const response = await fetch('http://localhost:8000/product/all');
+      const response = await fetch('https://backend-topaz-one-89.vercel.app/product/all');
       const data = await response.json();
       if (data.success) {
         setProducts(data.data);
@@ -32,7 +32,7 @@ const AdminDashboard = () => {
   const handleDelete = async (id) => {
     if (window.confirm('Are you sure you want to delete this product?')) {
       try {
-        const response = await fetch(`http://localhost:8000/product/delete/${id}`, {
+        const response = await fetch(`https://backend-topaz-one-89.vercel.app/product/delete/${id}`, {
           method: 'DELETE',
         });
         const data = await response.json();

@@ -8,7 +8,7 @@ const AddProduct = () => {
 
   const handleCreate = async (formData) => {
     try {
-      const response = await fetch('http://localhost:8000/product/create', {
+      const response = await fetch('https://backend-topaz-one-89.vercel.app/product/create', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

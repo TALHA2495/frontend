@@ -1,0 +1,10 @@
+/* Cleared default Vite styles to prevent interference with Tailwind layout */
+
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE & Edge */
+  scrollbar-width: none;     /* Firefox */
+}

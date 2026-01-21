@@ -12,7 +12,7 @@ const getAuthHeaders = () => {
 
 export const cartAPI = {
     getCart: async () => {
-        const response = await fetch(BASE_URL, {
+        const response = await fetch(`${BASE_URL}/all`, {
             headers: getAuthHeaders()
         });
         return response.json();

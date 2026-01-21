@@ -12,6 +12,8 @@ import { productAPI } from "../api/products";
 import { useDispatch } from "react-redux";
 import { addToCart } from "../redux/features/cart";
 import { toast } from "react-toastify";
+import { useAuth } from "../context/AuthContext";
+import { cartAPI } from "../api/cart";
 
 const ProductDetail = () => {
   const { id } = useParams();
@@ -22,9 +24,17 @@ const ProductDetail = () => {
   const [relatedProducts, setRelatedProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const dispatch = useDispatch();
+  const { user } = useAuth();
 
-  const handleAddToCart = () => {
+  const handleAddToCart = async () => {
     if (product) {
+      if (user) {
+        try {
+          await cartAPI.addToCart(product);
+        } catch (error) {
+          console.error("Error adding to cart DB:", error);
+        }
+      }
       dispatch(addToCart(product));
       toast.success("Added to cart");
     }

@@ -1,7 +1,40 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+import { cartAPI } from "../../api/cart";
+
+export const fetchCartDB = createAsyncThunk(
+  "cart/fetchDB",
+  async (_, { rejectWithValue }) => {
+    try {
+      const data = await cartAPI.getCart();
+      return data.items.map(item => ({
+        ...item,
+        _id: item.productId // map back to _id for frontend consistency
+      }));
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+export const syncCartDB = createAsyncThunk(
+  "cart/syncDB",
+  async (items, { rejectWithValue }) => {
+    try {
+      const data = await cartAPI.syncCart(items);
+      return data.items.map(item => ({
+        ...item,
+        _id: item.productId
+      }));
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
 
 const initialState = {
   items: [],
+  loading: false,
+  error: null,
 };
 
 const cartSlice = createSlice({
@@ -10,7 +43,6 @@ const cartSlice = createSlice({
   reducers: {
     addToCart: (state, action) => {
       const product = action.payload;
-      // Backend products use _id
       const existing = state.items.find(
         (item) => item._id === product._id
       );
@@ -42,9 +74,30 @@ const cartSlice = createSlice({
     clearCart: (state) => {
       state.items = [];
     },
+
+    setCart: (state, action) => {
+      state.items = action.payload;
+    }
+  },
+  extraReducers: (builder) => {
+    builder
+      .addCase(fetchCartDB.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(fetchCartDB.fulfilled, (state, action) => {
+        state.loading = false;
+        state.items = action.payload;
+      })
+      .addCase(fetchCartDB.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+      .addCase(syncCartDB.fulfilled, (state, action) => {
+        state.items = action.payload;
+      });
   },
 });
 
-export const { addToCart, removeFromCart, updateQuantity, clearCart } = cartSlice.actions;
+export const { addToCart, removeFromCart, updateQuantity, clearCart, setCart } = cartSlice.actions;
 
 export default cartSlice.reducer;

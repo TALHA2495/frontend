@@ -4,13 +4,22 @@ import { toast } from "react-toastify";
 import { Link } from 'react-router-dom';
 import { useDispatch } from "react-redux";
 import { addToCart } from "../../redux/features/cart";
+import { useAuth } from '../../context/AuthContext';
+import { cartAPI } from '../../api/cart';
 
 const ProductItem = ({ product, viewType }) => {
-
     const dispatch = useDispatch();
+    const { user } = useAuth();
 
-    const handleAddToCart = (e) => {
-        e.preventDefault(); // Prevent link navigation if wrapped
+    const handleAddToCart = async (e) => {
+        e.preventDefault(); 
+        if (user) {
+            try {
+                await cartAPI.addToCart(product);
+            } catch (error) {
+                console.error("Error adding to cart DB:", error);
+            }
+        }
         dispatch(addToCart(product));
         toast.success("Added to cart");
     }

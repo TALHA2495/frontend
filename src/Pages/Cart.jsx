@@ -9,11 +9,22 @@ import {
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
-import { removeFromCart, updateQuantity, clearCart } from '../redux/features/cart';
+import { removeFromCart, updateQuantity, clearCart, fetchCartDB } from '../redux/features/cart';
+import { useAuth } from '../context/AuthContext';
+import { cartAPI } from '../api/cart';
+import { useEffect } from 'react';
 
 const Cart = () => {
     const cartItems = useSelector((state) => state.cart.items);
     const dispatch = useDispatch();
+    const { user } = useAuth();
+
+    // Fetch remote cart on mount if logged in
+    useEffect(() => {
+        if (user) {
+            dispatch(fetchCartDB());
+        }
+    }, [user, dispatch]);
 
     const parsePrice = (priceStr) => {
         if (typeof priceStr === 'number') return priceStr;
@@ -34,12 +45,26 @@ const Cart = () => {
         { name: "GoPro HERO6 4K Action Camera - Black", price: "$99.50", image: "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?auto=format&fit=crop&q=80&w=150" },
     ];
 
-    const handleRemove = (id) => {
+    const handleRemove = async (id) => {
+        if (user) {
+            try {
+                await cartAPI.removeFromCart(id);
+            } catch (error) {
+                console.error("Error removing from cart DB:", error);
+            }
+        }
         dispatch(removeFromCart(id));
     };
 
-    const handleQuantityChange = (id, newQty) => {
+    const handleQuantityChange = async (id, newQty) => {
         if (newQty > 0) {
+            if (user) {
+                try {
+                    await cartAPI.updateQuantity(id, newQty);
+                } catch (error) {
+                    console.error("Error updating quantity in DB:", error);
+                }
+            }
             dispatch(updateQuantity({ _id: id, quantity: newQty }));
         }
     };
@@ -127,7 +152,16 @@ const Cart = () => {
                                       <ArrowLeft className="w-4 h-4" />
                                       Back to shop
                                   </Link>
-                                  <button onClick={() => dispatch(clearCart())} className="text-blue-600 font-medium text-sm hover:underline">
+                                  <button onClick={async () => {
+                                      if (user) {
+                                          try {
+                                              await cartAPI.clearCart();
+                                          } catch (error) {
+                                              console.error("Error clearing cart DB:", error);
+                                          }
+                                      }
+                                      dispatch(clearCart());
+                                  }} className="text-blue-600 font-medium text-sm hover:underline">
                                       Remove all
                                   </button>
                              </div>

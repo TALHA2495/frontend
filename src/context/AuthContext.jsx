@@ -53,6 +53,28 @@ export const AuthProvider = ({ children }) => {
         localStorage.setItem('user', JSON.stringify(data.user));
         setToken(data.token);
         setUser(data.user);
+        
+        // Sync cart after login
+        const storedState = localStorage.getItem('persist:root');
+        if (storedState) {
+          try {
+            const rootState = JSON.parse(storedState);
+            const cartItems = JSON.parse(rootState.cart).items;
+            if (cartItems && cartItems.length > 0) {
+              await fetch('https://backend-topaz-one-89.vercel.app/api/cart/sync', {
+                method: 'POST',
+                headers: {
+                  'Content-Type': 'application/json',
+                  'Authorization': `Bearer ${data.token}`
+                },
+                body: JSON.stringify({ items: cartItems })
+              });
+            }
+          } catch (e) {
+            console.error('Error syncing cart on login:', e);
+          }
+        }
+
         toast.success('Login Successful!');
         navigate('/');
         return { success: true };
